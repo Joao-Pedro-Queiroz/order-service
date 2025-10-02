@@ -22,3 +22,7 @@ spring:
     properties:
       hibernate:
         default_schema: order
+
+logging:
+  level:
+    store: debug

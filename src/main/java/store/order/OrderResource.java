@@ -10,26 +10,30 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 public class OrderResource implements OrderController {
 
-  @Autowired private OrderService orderService;
+  @Autowired
+  private OrderService orderService;
 
   @Override
   public ResponseEntity<OrderOut> create(OrderIn in) {
-    var created = orderService.create(in);
-    var out = OrderParser.toOut(created);
-    var location = ServletUriComponentsBuilder.fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(out.id())
-                    .toUri();
-    return ResponseEntity.created(location).body(out); // 201
+    String idAccount = CurrentRequest.idAccount();
+    OrderOut out = orderService.create(in, idAccount);
+    return ResponseEntity.created(
+        ServletUriComponentsBuilder.fromCurrentRequest()
+            .path("/{id}")
+            .buildAndExpand(out.id())
+            .toUri()
+    ).body(out);
   }
 
   @Override
-  public ResponseEntity<List<OrderSummaryOut>> findAll() {
-    return ResponseEntity.ok(OrderParser.toSummary(orderService.findAll()));
+  public ResponseEntity<List<OrderOut>> findAll() {
+    String idAccount = CurrentRequest.idAccount();
+    return ResponseEntity.ok(orderService.findAll(idAccount));
   }
 
   @Override
   public ResponseEntity<OrderOut> findById(String id) {
-    return ResponseEntity.ok(OrderParser.toOut(orderService.findById(id)));
+    String idAccount = CurrentRequest.idAccount();
+    return ResponseEntity.ok(orderService.findById(id, idAccount));
   }
 }
